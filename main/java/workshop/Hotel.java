@@ -50,6 +50,8 @@ public class Hotel {
 	public int calculateRent(String type, String finalDay) {
 		if (type.equals("Regular") && (1 <= findDay(finalDay) && findDay(finalDay) <= 5)) {
 			return regularWD;
+		} else if (type.equals("Regular") && (6 <= findDay(finalDay) && findDay(finalDay) <= 7)) {
+			return regularWK;
 		}
 		return 0;
 	}

@@ -3,12 +3,7 @@ package workshop;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class HotelReservation {
@@ -17,6 +12,7 @@ public class HotelReservation {
 	public HotelReservation() {
 		hotelMap = new HashMap<>();
 	}
+
 	/**
 	 * Adding the hotel to map
 	 * 
@@ -28,21 +24,20 @@ public class HotelReservation {
 		hotelMap.put(name, hotel);
 	}
 
-	
 	/**
 	 * Adding the hotel to map
 	 * 
 	 * @param name
 	 * @param regularWD
 	 */
-	public void add(String name, int regularWD, int regularWK) {
-		Hotel hotel = new Hotel(name, regularWD, regularWK);
+	public void add(String name, int regularWD, int regularWE) {
+		Hotel hotel = new Hotel(name, regularWD, regularWE);
 		hotelMap.put(name, hotel);
 	}
 
 	public static String dayOfWeek(String args) throws ParseException {
 		String input_date = args;
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
 		Date date = dateFormat.parse(input_date);
 		DateFormat date_Format = new SimpleDateFormat("EEEE");
 		String dayOfWeek = date_Format.format(date);
@@ -71,20 +66,26 @@ public class HotelReservation {
 	 * @return
 	 * @throws ParseException
 	 */
-	public String cheapestHotel(String fromDate, String toDate) throws ParseException {
+	public List<String> cheapestHotel(String fromDate, String toDate) throws ParseException {
 		String[] arguments = { fromDate, toDate };
-		String hotelName = "";
+		int count = 0;
 		Map<String, Integer> rentMap = createRentMap(arguments); // Creating a rent map for hotels for the dates
 		List<Integer> hotelRates = new ArrayList<>();
 		hotelRates = rentMap.values().stream().collect(Collectors.toList()); // list of hotel rates
 		Collections.sort(hotelRates);
+		List<String> cheapestHotels = new ArrayList<>();
 		for (Map.Entry<String, Integer> entry : rentMap.entrySet()) {
 			if (entry.getValue() == (int) hotelRates.get(0)) { // Comparing the hotel rate with cheapest rate for hotel
-																// name
-				hotelName = entry.getKey();
+																// // name
+				cheapestHotels.add(entry.getKey());
+				count++;
 			}
 		}
-		return hotelName;
+		for (int i = 0; i < count; i++) {
+			System.out.print(cheapestHotels.get(i) + " - ");
+		}
+		System.out.println(" with The Total Rates $" + hotelRates.get(0));
+		return cheapestHotels;
 	}
 
 	/**
@@ -100,4 +101,4 @@ public class HotelReservation {
 	public int size() {
 		return hotelMap.size();
 	}
-}	
+}
