@@ -62,6 +62,26 @@ public class HotelReservation {
 		}
 		return rentMap;
 	}
+	
+	public String cheapestBestRated(String fromDate, String toDate) throws ParseException {
+		List<String> cheapHotels = cheapestHotel(fromDate, toDate);
+		int rating = 0;
+		int count = 0;
+		String hotelName = "";
+		for (Map.Entry<String, Hotel> entry : hotelMap.entrySet()) {
+			if (entry.getKey().equals(cheapHotels.get(count))) {
+				if (entry.getValue().getRatings() > rating) {
+					rating = entry.getValue().getRatings();
+					hotelName = entry.getKey();
+					if (cheapHotels.size() != 1) {
+						count++;
+					}
+				}
+			}
+		}
+		System.out.println();
+		return hotelName;
+	}
 
 	/**
 	 * Finding the cheapest hotel from different hotel
