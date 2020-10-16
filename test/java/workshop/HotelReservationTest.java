@@ -9,7 +9,6 @@ import org.junit.Test;
 
 public class HotelReservationTest {
 
-
 	/**
 	 * Usecase1 for adding hotel's data
 	 */
@@ -33,7 +32,6 @@ public class HotelReservationTest {
 		hotel.add("Lakewood", 110, 90);
 		hotel.add("Bridgewood", 150, 50);
 		hotel.add("Ridgewood", 220, 150);
-		hotel.printHotels();
 		int result = hotel.size();
 		assertEquals(3, result);
 	}
@@ -48,7 +46,6 @@ public class HotelReservationTest {
 		hotel.add("Lakewood", 110, 90);
 		hotel.add("Bridgewood", 150, 50);
 		hotel.add("Ridgewood", 220, 150);
-		hotel.printHotels();
 		List<String> result = new ArrayList<>();
 		try {
 			result = hotel.cheapestHotel("12Sep2020", "13Sep2020");
@@ -67,10 +64,9 @@ public class HotelReservationTest {
 		hotel.add("Lakewood", 330, 120);
 		hotel.add("Bridgewood", 160, 60);
 		hotel.add("Ridgewood", 440, 180);
-		hotel.printHotels();
 		List<String> result = new ArrayList<>();
 		try {
-			result = hotel.cheapestHotel("08Sep2020", "11Sep2020");
+			result = hotel.cheapestHotel("10Sep2020", "11Sep2020");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -86,7 +82,6 @@ public class HotelReservationTest {
 		hotel.add("Lakewood", 110, 90);
 		hotel.add("Bridgewood", 150, 50);
 		hotel.add("Ridgewood", 220, 150);
-		hotel.printHotels();
 		List<String> result = new ArrayList<>();
 		try {
 			result = hotel.cheapestHotel("11Sep2020", "12Sep2020");
@@ -96,7 +91,7 @@ public class HotelReservationTest {
 		assertEquals("Bridgewood", result.get(0));
 		assertEquals("Lakewood", result.get(1));
 	}
-	
+
 	/**
 	 * Usecase5 for adding data along with ratings for hotel
 	 */
@@ -106,11 +101,10 @@ public class HotelReservationTest {
 		hotel.add("Lakewood", 110, 90, 3);
 		hotel.add("Bridgewood", 150, 50, 4);
 		hotel.add("Ridgewood", 220, 150, 5);
-		hotel.printHotels();
 		int result = hotel.size();
 		assertEquals(3, result);
 	}
-	
+
 	/**
 	 * Usecase6 for finding cheapest best rated hotel
 	 */
@@ -130,10 +124,10 @@ public class HotelReservationTest {
 	}
 
 	/**
-	 * Finding cheapest best rated hotel 
+	 * Finding cheapest best rated hotel(handled for out of bound exception )
 	 */
 	@Test
-	public void givenNewDatawithRatings_WhenAddedToMap_ShouldReturnBestRated() {
+	public void givenNewDatawithRatings_WhenAddedToMap_ShouldReturnCheapestBestRated() {
 		HotelReservation hotel = new HotelReservation();
 		hotel.add("Lakewood", 200, 90, 3);
 		hotel.add("Bridgewood", 180, 50, 4);
@@ -146,5 +140,20 @@ public class HotelReservationTest {
 		}
 		assertEquals("Bridgewood", result);
 	}
+	@Test
+	public void givenNewDatawithRatings_WhenAddedToMap_ShouldReturnBestRated() {
+		HotelReservation hotel = new HotelReservation();
+		hotel.add("Lakewood", 200, 90, 3);
+		hotel.add("Bridgewood", 180, 50, 4);
+		hotel.add("Ridgewood", 220, 150, 5);
+		String result = "";
+		try {
+			result = hotel.bestRatedHotel("11Sep2020", "12Sep2020");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		assertEquals("Ridgewood", result);
+	}
+
 }
 
