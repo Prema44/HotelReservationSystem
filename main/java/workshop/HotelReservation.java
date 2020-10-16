@@ -34,6 +34,11 @@ public class HotelReservation {
 		Hotel hotel = new Hotel(name, regularWD, regularWE);
 		hotelMap.put(name, hotel);
 	}
+	
+	public void add(String name, int regularWD, int regularWE, int rating) {
+		Hotel hotel = new Hotel(name, regularWD, regularWE, rating);
+		hotelMap.put(name, hotel);
+	}
 
 	public static String dayOfWeek(String args) throws ParseException {
 		String input_date = args;

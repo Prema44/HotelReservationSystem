@@ -6,6 +6,7 @@ public class Hotel {
 	private String hotelName;
 	private int regularWD;
 	private int regularWK;
+	private int ratings;
 
 	public Hotel(String hotelName, int regularWD) {
 		this.hotelName = hotelName;
@@ -18,6 +19,14 @@ public class Hotel {
 		this.regularWK = regularWE;
 
 	}
+	
+	public Hotel(String hotelName, int regularWD, int regularWK, int ratings) {
+		this.hotelName = hotelName;
+		this.regularWD = regularWD;
+		this.regularWK = regularWK;
+		this.ratings = ratings;
+
+	}	
 
 	public String getHotelName() {
 		return hotelName;
@@ -41,6 +50,14 @@ public class Hotel {
 
 	public void setRegularWD(int regularWD) {
 		this.regularWD = regularWD;
+	}
+	
+	public int getRatings() {
+		return ratings;
+	}
+
+	public void setRatings(int ratings) {
+		this.ratings = ratings;
 	}
 	
 	public int findDay(String day) {
