@@ -90,11 +90,15 @@ public class Hotel {
 		return DayOfWeek.valueOf(day.toUpperCase()).getValue();
 	}
 
-	public int calculateRent(String type, String finalDay) {
-		if (type.equals("Regular") && (1 <= findDay(finalDay) && findDay(finalDay) <= 5)) {
+	public int calculateRent(String type, String day) {
+		if (type.equals("Regular") && day.equals("Weekday")) {
 			return regularWD;
-		} else if (type.equals("Regular") && (6 <= findDay(finalDay) && findDay(finalDay) <= 7)) {
+		} else if (type.equals("Regular") && day.equals("Weekend")) {
 			return regularWK;
+		} else if (type.equals("Reward") && day.equals("Weekday")) {
+			return rewardsWD;
+		} else if (type.equals("Reward") && day.equals("Weekend")) {
+			return rewardsWK;
 		}
 		return 0;
 	}

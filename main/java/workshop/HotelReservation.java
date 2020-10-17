@@ -1,8 +1,10 @@
 package workshop;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,35 +47,54 @@ public class HotelReservation {
 		hotelMap.put(name, hotel);
 	}
 
-	public static String dayOfWeek(String args) throws ParseException {
-		String input_date = args;
-		SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
-		Date date = dateFormat.parse(input_date);
-		DateFormat date_Format = new SimpleDateFormat("EEEE");
-		String dayOfWeek = date_Format.format(date);
-		return dayOfWeek;
+	/**
+	 * finding the number of days in the date range
+	 * 
+	 * @param fromDate
+	 * @param toDate
+	 * @return
+	 * @throws ParseException
+	 */
+	public static int[] numOfDays(String fromDate, String toDate) throws ParseException {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMMyyyy");
+		LocalDate from = LocalDate.parse(fromDate, formatter);
+		LocalDate to = LocalDate.parse(toDate, formatter);
+		int numOfweekdays = 0;
+		int numOfWeekends = 0;
+		for (LocalDate date = from; date.isBefore(to.plusDays(1)); date = date.plusDays(1)) {
+			DayOfWeek day = DayOfWeek.of(date.get(ChronoField.DAY_OF_WEEK));
+			switch (day) {
+			case SATURDAY:
+				numOfWeekends++;
+				break;
+			case SUNDAY:
+				numOfWeekends++;
+				break;
+			default:
+				numOfweekdays++;
+				break;
+			}
+		}
+		return new int[] { numOfweekdays, numOfWeekends };
 	}
 
-	public static Map<String, Integer> createRentMap(String[] arguments) throws ParseException {
+	public static Map<String, Integer> createRentMap(String fromDate, String toDate, String type)
+			throws ParseException {
 		HashMap<String, Integer> rentMap = new HashMap<>();
-		int tempValue;
+		int[] numOfDays = numOfDays(fromDate, toDate);
 		for (Map.Entry<String, Hotel> entry : hotelMap.entrySet()) {
-			int rent = 0;
-			for (int i = 0; i < arguments.length; i++) {
-				tempValue = entry.getValue().calculateRent("Regular", dayOfWeek(arguments[i]));
-				rent = tempValue + rent;
-			}
-			rentMap.put(entry.getValue().getHotelName(), rent);
+			int wdRent = entry.getValue().calculateRent(type, "Weekday") * numOfDays[0];
+			int weRent = entry.getValue().calculateRent(type, "Weekend") * numOfDays[1];
+			int totalRent = wdRent + weRent;
+			rentMap.put(entry.getValue().getHotelName(), totalRent);
 		}
 		return rentMap;
 	}
-	
-	public String cheapestBestRated(String fromDate, String toDate) throws ParseException {
-		List<String> cheapHotels = cheapestHotel(fromDate, toDate);
-		String[] arguments = {fromDate, toDate};
+
+	public String cheapestBestRated(String fromDate, String toDate, String type) throws ParseException {
+		List<String> cheapHotels = cheapestHotel(fromDate, toDate, type);
 		int rating = 0;
 		int count = 0;
-		
 		String hotelName = "";
 		for (Map.Entry<String, Hotel> entry : hotelMap.entrySet()) {
 			if (entry.getKey().equals(cheapHotels.get(count))) {
@@ -86,7 +107,8 @@ public class HotelReservation {
 				}
 			}
 		}
-		System.out.println(hotelName+","+"Rating: "+rating+" Total rate is "+createRentMap(arguments).get(hotelName));
+		System.out.println(hotelName + "," + "Rating: " + rating + " Total rate is "
+				+ createRentMap(fromDate, toDate, type).get(hotelName));
 		return hotelName;
 	}
 
@@ -98,10 +120,10 @@ public class HotelReservation {
 	 * @return
 	 * @throws ParseException
 	 */
-	public List<String> cheapestHotel(String fromDate, String toDate) throws ParseException {
-		String[] arguments = { fromDate, toDate };
+	public List<String> cheapestHotel(String fromDate, String toDate, String type) throws ParseException {
 		int count = 0;
-		Map<String, Integer> rentMap = createRentMap(arguments); // Creating a rent map for hotels for the dates
+		Map<String, Integer> rentMap = createRentMap(fromDate, toDate, type); // Creating a rent map for hotels for the
+																				// dates
 		List<Integer> hotelRates = new ArrayList<>();
 		hotelRates = rentMap.values().stream().collect(Collectors.toList()); // list of hotel rates
 		Collections.sort(hotelRates);
@@ -119,10 +141,9 @@ public class HotelReservation {
 		System.out.println(" with The Total Rates $" + hotelRates.get(0));
 		return cheapestHotels;
 	}
-	
-	public String bestRatedHotel(String fromDate, String toDate ) throws ParseException {
+
+	public String bestRatedHotel(String fromDate, String toDate, String type) throws ParseException {
 		int rating = 0;
-		String[] arguments = {fromDate, toDate};
 		String hotelName = "";
 		for (Map.Entry<String, Hotel> entry : hotelMap.entrySet()) {
 			if (entry.getValue().getRatings() > rating) {
@@ -130,9 +151,10 @@ public class HotelReservation {
 				hotelName = entry.getKey();
 			}
 		}
-		System.out.println(hotelName+","+" Total rate is "+createRentMap(arguments).get(hotelName));
+		System.out.println(hotelName + "," + " Total rate is " + createRentMap(fromDate, toDate, type).get(hotelName));
 		return hotelName;
 	}
+
 
 	/**
 	 * Printing the hotel data

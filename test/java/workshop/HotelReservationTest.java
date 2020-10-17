@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -48,7 +49,7 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 220, 150);
 		List<String> result = new ArrayList<>();
 		try {
-			result = hotel.cheapestHotel("12Sep2020", "13Sep2020");
+			result = hotel.cheapestHotel("12Sep2020", "13Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -66,7 +67,7 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 440, 180);
 		List<String> result = new ArrayList<>();
 		try {
-			result = hotel.cheapestHotel("10Sep2020", "11Sep2020");
+			result = hotel.cheapestHotel("10Sep2020", "11Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -84,7 +85,7 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 220, 150);
 		List<String> result = new ArrayList<>();
 		try {
-			result = hotel.cheapestHotel("11Sep2020", "12Sep2020");
+			result = hotel.cheapestHotel("11Sep2020", "12Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -116,7 +117,7 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 220, 150, 5);
 		String result = "";
 		try {
-			result = hotel.cheapestBestRated("11Sep2020", "12Sep2020");
+			result = hotel.cheapestBestRated("11Sep2020", "12Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -134,12 +135,16 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 150, 150, 5);
 		String result = "";
 		try {
-			result = hotel.cheapestBestRated("11Sep2020", "12Sep2020");
+			result = hotel.cheapestBestRated("11Sep2020", "12Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		assertEquals("Bridgewood", result);
 	}
+
+	/**
+	 * Usecase7 for finding best rated hotel
+	 */
 	@Test
 	public void givenNewDatawithRatings_WhenAddedToMap_ShouldReturnBestRated() {
 		HotelReservation hotel = new HotelReservation();
@@ -148,15 +153,15 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 220, 150, 5);
 		String result = "";
 		try {
-			result = hotel.bestRatedHotel("11Sep2020", "12Sep2020");
+			result = hotel.bestRatedHotel("11Sep2020", "12Sep2020", "Regular");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		assertEquals("Ridgewood", result);
 	}
-	
+
 	/**
-	 * Usecase8 for assigning rates for reward customers
+	 * Usecase8 for assigning rates for reward customer
 	 */
 	@Test
 	public void givenHotelDataForRewardCustomer_WhenAddedToMap_ShouldPassResult() {
@@ -166,6 +171,63 @@ public class HotelReservationTest {
 		hotel.add("Ridgewood", 220, 150, 5, 100, 40);
 		int result = hotel.size();
 		assertEquals(3, result);
+	}
+
+	/**
+	 * Usecase9 finding cheapest hotel for reward customer
+	 */
+	@Test
+	public void givenHotelData_WhenAddedToMap_ShouldReturnCheapestBestRated() {
+		HotelReservation hotel = new HotelReservation();
+		hotel.add("Lakewood", 110, 90, 3, 80, 80);
+		hotel.add("Bridgewood", 150, 50, 4, 110, 50);
+		hotel.add("Ridgewood", 220, 150, 5, 100, 40);
+		String result = "";
+		try {
+			result = hotel.cheapestBestRated("11Sep2020", "13Sep2020", "Reward");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		assertEquals("Ridgewood", result);
+	}
+
+	/**
+	 * Usecase9 for taking inputs for date range and type of customer and finding
+	 * cheapest best rated hotel for reward customer
+	 * 
+	 * @throws HotelException
+	 */
+	@Test
+	public void takingDataFromUser_WhenAddedToMap_ShouldReturnCheapestBestRated() throws HotelException {
+		Scanner scanner = new Scanner(System.in);
+		HotelReservation hotel = new HotelReservation();
+		hotel.add("Lakewood", 110, 90, 3, 80, 80);
+		hotel.add("Bridgewood", 150, 50, 4, 110, 50);
+		hotel.add("Ridgewood", 220, 150, 5, 100, 40);
+		System.out.println("Enter the date range: ");
+		String from = "";
+		String to = "";
+		try {
+			from = scanner.nextLine();
+			to = scanner.nextLine();
+		} catch (Exception e) {
+			throw new HotelException("Invalid date range");
+		}
+		System.out.println("Enter the type of customer");
+		String type = "";
+		try {
+			type = scanner.nextLine();
+		} catch (Exception e) {
+			throw new HotelException("Invalid type");
+		}
+		String result = "";
+		try {
+			result = hotel.cheapestBestRated(from, to, type);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		assertEquals("Ridgewood", result);
+		scanner.close();
 	}
 
 }
