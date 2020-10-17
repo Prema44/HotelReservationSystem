@@ -6,7 +6,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HotelReservation {
 	static Map<String, Hotel> hotelMap;
@@ -78,16 +79,16 @@ public class HotelReservation {
 		return new int[] { numOfweekdays, numOfWeekends };
 	}
 
-	public static Map<String, Integer> createRentMap(String fromDate, String toDate, String type)
+	public static TreeMap<Integer, LinkedList<String>> createRentMap(String fromDate, String toDate, String type)
 			throws ParseException {
-		HashMap<String, Integer> rentMap = new HashMap<>();
+		TreeMap<Integer, LinkedList<String>> rentMap = new TreeMap<>();
 		int[] numOfDays = numOfDays(fromDate, toDate);
-		for (Map.Entry<String, Hotel> entry : hotelMap.entrySet()) {
-			int wdRent = entry.getValue().calculateRent(type, "Weekday") * numOfDays[0];
-			int weRent = entry.getValue().calculateRent(type, "Weekend") * numOfDays[1];
+		hotelMap.forEach((k, v) -> {
+			int wdRent = v.calculateRent(type, "Weekday") * numOfDays[0];
+			int weRent = v.calculateRent(type, "Weekend") * numOfDays[1];
 			int totalRent = wdRent + weRent;
-			rentMap.put(entry.getValue().getHotelName(), totalRent);
-		}
+			rentMap.computeIfAbsent(totalRent, t -> new LinkedList<>()).add(k);
+		});
 		return rentMap;
 	}
 
@@ -108,7 +109,7 @@ public class HotelReservation {
 			}
 		}
 		System.out.println(hotelName + "," + "Rating: " + rating + " Total rate is "
-				+ createRentMap(fromDate, toDate, type).get(hotelName));
+				+ createRentMap(fromDate, toDate, type).firstKey());
 		return hotelName;
 	}
 
@@ -120,25 +121,10 @@ public class HotelReservation {
 	 * @return
 	 * @throws ParseException
 	 */
-	public List<String> cheapestHotel(String fromDate, String toDate, String type) throws ParseException {
-		int count = 0;
-		Map<String, Integer> rentMap = createRentMap(fromDate, toDate, type); // Creating a rent map for hotels for the
-																				// dates
-		List<Integer> hotelRates = new ArrayList<>();
-		hotelRates = rentMap.values().stream().collect(Collectors.toList()); // list of hotel rates
-		Collections.sort(hotelRates);
-		List<String> cheapestHotels = new ArrayList<>();
-		for (Map.Entry<String, Integer> entry : rentMap.entrySet()) {
-			if (entry.getValue() == (int) hotelRates.get(0)) { // Comparing the hotel rate with cheapest rate for hotel
-																// // name
-				cheapestHotels.add(entry.getKey());
-				count++;
-			}
-		}
-		for (int i = 0; i < count; i++) {
-			System.out.print(cheapestHotels.get(i) + " - ");
-		}
-		System.out.println(" with The Total Rates $" + hotelRates.get(0));
+	public LinkedList<String> cheapestHotel(String fromDate, String toDate, String type) throws ParseException {
+		TreeMap<Integer, LinkedList<String>> rentMap = createRentMap(fromDate, toDate, type); // Creating a rent map for
+																								// hotels for the
+		LinkedList<String> cheapestHotels = rentMap.get(rentMap.firstKey());
 		return cheapestHotels;
 	}
 
@@ -151,10 +137,9 @@ public class HotelReservation {
 				hotelName = entry.getKey();
 			}
 		}
-		System.out.println(hotelName + "," + " Total rate is " + createRentMap(fromDate, toDate, type).get(hotelName));
+		System.out.println(hotelName + "," + " Total rate is " + createRentMap(fromDate, toDate, type).firstKey());
 		return hotelName;
 	}
-
 
 	/**
 	 * Printing the hotel data
@@ -167,5 +152,44 @@ public class HotelReservation {
 
 	public int size() {
 		return hotelMap.size();
+	}
+
+	/**
+	 * Validating the dates for the regular expression
+	 * 
+	 * @param fromDate
+	 * @param toDate
+	 * @throws HotelException
+	 */
+	public void validateUserInputs(String fromDate, String toDate) throws HotelException {
+		String expression = "^[0-9]{2}[A-Za-z]{3}[0-9]{4}$";
+		Pattern pattern = Pattern.compile(expression);
+		Matcher from = pattern.matcher(fromDate);
+		Matcher to = pattern.matcher(toDate);
+		if (!from.find() || !to.find()) {
+			throw new HotelException("Invalid Inputs");
+		}
+		return;
+	}
+
+	@SuppressWarnings("resource")
+	public static void main(String[] args) throws HotelException {
+		HotelReservation hotel = new HotelReservation();
+		Scanner scanner = new Scanner(System.in);
+		hotel.add("Lakewood", 110, 90, 3, 80, 80);
+		hotel.add("Bridgewood", 150, 50, 4, 110, 50);
+		hotel.add("Ridgewood", 220, 150, 5, 100, 40);
+		System.out.println("Enter the date for hotel");
+		String from = scanner.nextLine();
+		String to = scanner.nextLine();
+		System.out.println("Enter the type of customer");
+		String type = scanner.nextLine();
+		hotel.validateUserInputs(from, to);
+		try {
+			hotel.bestRatedHotel(from, to, type);
+		} catch (Exception e) {
+			throw new HotelException("Invalid Date Entry");
+		}
+		scanner.close();
 	}
 }
